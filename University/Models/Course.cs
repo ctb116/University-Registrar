@@ -27,10 +27,11 @@ namespace University.Models
       conn.Open();
 
       var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"INSERT INTO courses (name, course_number) VALUES (@name, @course_number, @dept_id);";
+      cmd.CommandText = @"INSERT INTO courses (name, course_number, dept_id, cost) VALUES (@name, @course_number, @dept_id, @cost);";
       cmd.Parameters.AddWithValue("@name", this.Name);
       cmd.Parameters.AddWithValue("@course_number", this.Catalog);
       cmd.Parameters.AddWithValue("@dept_id", this.Dept_Id);
+      cmd.Parameters.AddWithValue("@cost", this.Cost);
 
       cmd.ExecuteNonQuery();
       Id = (int) cmd.LastInsertedId;
@@ -55,9 +56,10 @@ namespace University.Models
         int courseId = rdr.GetInt32(0);
         string courseName = rdr.GetString(1);
         string courseCatalog = rdr.GetString(2);
-        int courseDept = rdr.GetInt32(3);
+        int courseCost = rdr.GetInt32(3);
+        int courseDeptId = rdr.GetInt32(4);
 
-        Course newCourse = new Course(courseName, courseCatalog, courseDept, courseId);
+        Course newCourse = new Course(courseName, courseCatalog, courseCost, courseDeptId, courseId);
         allCourses.Add(newCourse);
       }
       conn.Close();
@@ -66,6 +68,34 @@ namespace University.Models
         conn.Dispose();
       }
       return allCourses;
+    }
+
+    public static Course Find(int id)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM courses WHERE id = @searchId;";
+      cmd.Parameters.AddWithValue("@searchId", id);
+
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      rdr.Read();
+
+      int foundId = rdr.GetInt32(0);
+      string name = rdr.GetString(1);
+      string catalog = rdr.GetString(2);
+      int cost = rdr.GetInt32(3);
+      int dept_id = rdr.GetInt32(4);
+
+      Course foundCourse = new Course(name, catalog, cost, dept_id, foundId);
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return foundCourse;
     }
 
     public void Delete()
@@ -96,6 +126,7 @@ namespace University.Models
       {
         conn.Dispose();
       }
+    }
 
   }
 }

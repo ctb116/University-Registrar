@@ -17,6 +17,15 @@ namespace University.Models
       Id = id;
       Name = name;
       Enrolled = enrolled;
+      Dept_Id = 0;
+    }
+
+    public Student(string name, DateTime enrolled, int id, int deptId = 0)
+    {
+      Id = id;
+      Name = name;
+      Enrolled = enrolled;
+      Dept_Id = deptId;
     }
 
     public void Save()
@@ -25,9 +34,10 @@ namespace University.Models
       conn.Open();
 
       var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"INSERT INTO students (name, enroll_date) VALUES (@name, @enroll_date);";
+      cmd.CommandText = @"INSERT INTO students (name, enroll_date, dept_id) VALUES (@name, @enroll_date, @dept_id);";
       cmd.Parameters.AddWithValue("@name", this.Name);
       cmd.Parameters.AddWithValue("@enroll_date", this.Enrolled);
+      cmd.Parameters.AddWithValue("@dept_id", this.Dept_Id);
 
       cmd.ExecuteNonQuery();
       Id = (int) cmd.LastInsertedId;
@@ -54,7 +64,7 @@ namespace University.Models
         DateTime studentEnrolled = rdr.GetDateTime(2);
         int studentDept = rdr.GetInt32(3);
 
-        Student newStudent = new Student(studentName, studentEnrolled, studentDept, studentId);
+        Student newStudent = new Student(studentName, studentEnrolled, studentId, studentDept);
         allStudents.Add(newStudent);
       }
       conn.Close();
@@ -63,6 +73,40 @@ namespace University.Models
         conn.Dispose();
       }
       return allStudents;
+    }
+
+    
+
+    public static Student Find(int id)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM students WHERE id = @searchId;";
+      cmd.Parameters.AddWithValue("@searchId", id);
+
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      int foundId = 0;
+      string name = "";
+      DateTime enrolled = DateTime.MinValue;
+      int dept = 0;
+      while (rdr.Read())
+      {
+        foundId = rdr.GetInt32(0);
+        name = rdr.GetString(1);
+        enrolled = rdr.GetDateTime(2);
+        dept = rdr.GetInt32(3);
+      }
+
+      Student foundStudent = new Student(name, enrolled, foundId, dept);
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return foundStudent;
     }
 
     public void Delete()
@@ -95,3 +139,4 @@ namespace University.Models
       }
     }
   }
+}

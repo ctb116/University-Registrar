@@ -49,8 +49,9 @@ namespace University.Models
         {
           int departmentId = rdr.GetInt32(0);
           string departmentName = rdr.GetString(1);
+          int deptmentBudget = rdr.GetInt32(2);
 
-          Department newDepartment = new Department(departmentName, departmentId);
+          Department newDepartment = new Department(departmentName, deptmentBudget, departmentId);
           allDepartments.Add(newDepartment);
         }
         conn.Close();
@@ -59,6 +60,33 @@ namespace University.Models
           conn.Dispose();
         }
         return allDepartments;
+      }
+
+      public static Department Find(int id)
+      {
+        MySqlConnection conn = DB.Connection();
+        conn.Open();
+
+        var cmd = conn.CreateCommand() as MySqlCommand;
+        cmd.CommandText = @"SELECT * FROM departments WHERE id = @searchId;";
+        cmd.Parameters.AddWithValue("@searchId", id);
+
+        var rdr = cmd.ExecuteReader() as MySqlDataReader;
+        rdr.Read();
+
+        int foundId = rdr.GetInt32(0);
+        string name = rdr.GetString(1);
+        int budget = rdr.GetInt32(2);
+
+
+        Department foundDepartment = new Department(name, budget, foundId);
+
+        conn.Close();
+        if (conn != null)
+        {
+          conn.Dispose();
+        }
+        return foundDepartment;
       }
 
       public void Delete()
@@ -89,5 +117,6 @@ namespace University.Models
         {
           conn.Dispose();
         }
+      }
   }
 }

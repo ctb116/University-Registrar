@@ -1,0 +1,36 @@
+@{
+  Layout = "_Layout";
+}
+@using University.Models;
+
+<div class="container">
+  <h1>@Student.Find(@Model.Student_Id).Name's Classes</h1>
+
+  <h2>Registration</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Student</th>
+        <th scope="col">Dept</th>
+        <th scope="col">Class</th>
+      </tr>
+    </thead>
+    <tbody>
+      @Registrar.FindAll(@Model.Id).Count
+
+      @foreach(Registrar registrar in Registrar.FindAll(@Model.Id))
+      {
+        <tr>
+          <td>@Student.Find(@registrar.Student_Id).Name</td>
+          <td>@Department.Find(@registrar.Dept_Id).Name</td>
+          <td>@Course.Find(@registrar.Course_Id).Name - @Course.Find(@registrar.Course_Id).Catalog</td>
+        </tr>
+      }
+      <tr>
+      </tbody>
+    </table>
+
+  <form action='/' method='get'>
+    <button class='btn btn-info' >Go Back</button>
+  </form>
+</div>

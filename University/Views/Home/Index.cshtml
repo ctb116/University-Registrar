@@ -1,7 +1,106 @@
 @{
   Layout = "_Layout";
 }
+@using University.Models;
 
 <div class="container">
+  <h1>Students</h1>
 
+
+  <div class="row">
+    <div class="col-md-4">
+      <h2>Add A student</h2>
+      <form class='form-group' action="/AddStudent" method="post">
+        <label for='name'>Name:</label>
+        <input name='name' type='text' required><br>
+        <label for='date'>Date Enrolled:</label>
+        <input name='date' type='date' required><br>
+        <button type='submit' class='btn btn-success'>Add</button>
+      </form>
+
+      <h2>Add A Course</h2>
+      <form class='form-group' action="/AddCourse" method="post">
+        <label for='name'>Name:</label>
+        <input name='name' type='text' required><br>
+        <label for='catalog'>Catalog Number:</label>
+        <input name='catalog' type='text' required><br>
+        <label for='cost'>Cost:</label>
+        <input name='cost' type='number' required><br>
+        <label for='deptID'>Department:</label>
+        <select class="form-control" name="deptID">
+            <option class="form-control" value="">
+          @foreach(Department dept in Department.GetAll())
+          {
+            <option class="form-control" value="@dept.Id">@dept.Name</option>
+          }
+        </select>
+        <button type='submit' class='btn btn-success'>Add</button>
+      </form>
+
+      <h2>Add A Department</h2>
+      <form class='form-group' action="/AddDepartment" method="post">
+        <label for='name'>Name:</label>
+        <input name='name' type='text' required><br>
+        <label for='budget'>Budget:</label>
+        <input name='budget' type='number' required><br>
+        <button type='submit' class='btn btn-success'>Add</button>
+      </form>
+
+      <h2>Enroll In A Class</h2>
+      <form class='form-group' action="/AddRegistrar" method="post">
+        <label for='studentID'>Student Name:</label>
+        <select class="form-control" name="studentID">
+            <option class="form-control" value="">
+          @foreach(Student student in Student.GetAll())
+          {
+            <option class="form-control" value="@student.Id">@student.Name</option>
+          }
+        </select>
+        <label for='deptID'>Department:</label>
+        <select class="form-control" name="deptID">
+            <option class="form-control" value="">
+          @foreach(Department dept in Department.GetAll())
+          {
+            <option class="form-control" value="@dept.Id">@dept.Name</option>
+          }
+        </select>
+          <label for='courseID'>Course:</label>
+          <select class="form-control" name="courseID">
+            <option class="form-control" value="">
+            @foreach(Course course in Course.GetAll())
+            {
+              <option class="form-control" value="@course.Id">@course.Name - @course.Catalog</option>
+            }
+        </select>
+        <button type='submit' class='btn btn-success'>Add</button>
+      </form>
+
+    </div>
+    <div class="col-md-8">
+      <h2>Registrar</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Student</th>
+            <th scope="col">Dept</th>
+            <th scope="col">Class</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach(Registrar registrar in Registrar.GetAll())
+          {
+            <tr>
+              <td>
+                <a href='/details/@Student.Find(@registrar.Student_Id).Id'>@Student.Find(@registrar.Student_Id).Name</a>
+              </td>
+              <td>@Department.Find(@registrar.Dept_Id).Name</td>
+              <td>@Course.Find(@registrar.Course_Id).Name - @Course.Find(@registrar.Course_Id).Catalog</td>
+            </tr>
+          }
+          <tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
 </div>
